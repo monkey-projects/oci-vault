@@ -69,8 +69,9 @@
    you can specify a `:crypto-endpoint` in the config."
   [conf]
   (cm/make-context conf
-                   #(or (:crypto-endpoint %)
-                        (crypto-endpoint (make-client conf) (select-keys % [:vault-id])))
+                   #(str (or (:crypto-endpoint %)
+                             (crypto-endpoint (make-client conf) (select-keys % [:vault-id])))
+                         "/" version)
                    crypto-routes))
 
 (cu/define-endpoints *ns* crypto-routes mc/response-for)
@@ -93,8 +94,9 @@
    or using the one specified."
   [conf]
   (cm/make-context conf
-                   #(or (:mgmt-endpoint %)
-                        (mgmt-endpoint (make-client conf) (select-keys % [:vault-id])))
+                   #(str (or (:mgmt-endpoint %)
+                             (mgmt-endpoint (make-client conf) (select-keys % [:vault-id])))
+                         "/" version)
                    mgmt-routes))
 
 (cu/define-endpoints *ns* mgmt-routes mc/response-for)

@@ -41,16 +41,18 @@
 (deftest make-crypto-client
   (testing "fetches vault crypto endpoint and returns a martian context"
     (with-redefs [sut/crypto-endpoint (constantly "test-crypto-ep")]
-      (is (= "test-crypto-ep" (-> fake-conf
-                                  (assoc :vault-id (str (random-uuid)))
-                                  sut/make-crypto-client
-                                  :api-root)))))
+      (is (= "test-crypto-ep/20180608"
+             (-> fake-conf
+                 (assoc :vault-id (str (random-uuid)))
+                 sut/make-crypto-client
+                 :api-root)))))
 
   (testing "uses specified crypto endpoint"
-    (is (= "test-crypto-ep" (-> fake-conf
-                                (assoc :crypto-endpoint "test-crypto-ep")
-                                sut/make-crypto-client
-                                :api-root)))))
+    (is (= "test-crypto-ep/20180608"
+           (-> fake-conf
+               (assoc :crypto-endpoint "test-crypto-ep")
+               sut/make-crypto-client
+               :api-root)))))
 
 (deftest encryption-endpoints
   (let [crypto-client (-> fake-conf
@@ -72,16 +74,18 @@
 (deftest make-mgmt-client
   (testing "fetches vault mgmt endpoint and returns a martian context"
     (with-redefs [sut/mgmt-endpoint (constantly "test-mgmt-ep")]
-      (is (= "test-mgmt-ep" (-> fake-conf
-                                  (assoc :vault-id (str (random-uuid)))
-                                  sut/make-mgmt-client
-                                  :api-root)))))
+      (is (= "test-mgmt-ep/20180608"
+             (-> fake-conf
+                 (assoc :vault-id (str (random-uuid)))
+                 sut/make-mgmt-client
+                 :api-root)))))
 
   (testing "uses specified mgmt endpoint"
-    (is (= "test-mgmt-ep" (-> fake-conf
-                                (assoc :mgmt-endpoint "test-mgmt-ep")
-                                sut/make-mgmt-client
-                                :api-root)))))
+    (is (= "test-mgmt-ep/20180608"
+           (-> fake-conf
+               (assoc :mgmt-endpoint "test-mgmt-ep")
+               sut/make-mgmt-client
+               :api-root)))))
 
 (deftest key-endpoints
     (let [mgmt-client (-> fake-conf
