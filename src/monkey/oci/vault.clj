@@ -52,7 +52,8 @@
      :body-schema {:encrypt {:key-id Id
                              :plaintext s/Str
                              (s/optional-key :encryption-algorithm) s/Str
-                             (s/optional-key :key-version-id) Id}}})
+                             (s/optional-key :key-version-id) Id}}
+     :consumes json})
 
    (api-route
     {:route-name :decrypt
@@ -61,7 +62,8 @@
      :body-schema {:decrypt {:key-id Id
                              :ciphertext s/Str
                              (s/optional-key :encryption-algorithm) s/Str
-                             (s/optional-key :key-version-id) Id}}})])
+                             (s/optional-key :key-version-id) Id}}
+     :consumes json})])
 
 (defn make-crypto-client
   "Creates a client that can be used to invoke crypto endpoints.  This means first
