@@ -95,3 +95,10 @@
         (let [c (mt/respond-with mgmt-client
                                  {:list-keys (constantly {:status 200})})]
           (is (= 200 (:status @(sut/list-keys c {:compartment-id "test-compartment-id"}))))))))
+
+(deftest base64
+  (testing "to and from base64"
+    (let [in "test string"
+          b64 (sut/->b64 in)]
+      (is (string? b64))
+      (is (= in (String. (sut/b64-> b64)))))))

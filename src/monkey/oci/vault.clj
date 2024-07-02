@@ -4,7 +4,8 @@
              [martian :as cm]
              [pagination :as p]
              [utils :as cu]]
-            [schema.core :as s]))
+            [schema.core :as s])
+  (:import java.util.Base64))
 
 (def version "20180608")
 (def host (partial format (str "https://kms.%s.oraclecloud.com/" version)))
@@ -102,3 +103,13 @@
                    mgmt-routes))
 
 (cu/define-endpoints *ns* mgmt-routes mc/response-for)
+
+(defn ->b64
+  "Converts the input string to base64"
+  [x]
+  (.encodeToString (Base64/getEncoder) (.getBytes x)))
+
+(defn b64->
+  "Decodes from base64, returns a byte array."
+  [x]
+  (.decode (Base64/getDecoder) x))
