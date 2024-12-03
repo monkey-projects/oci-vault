@@ -43,7 +43,7 @@ using your OCI configuration, then you can start invoking endpoints.
 (def vault (:body @(v/get-vault client {:vault-id "vault-ocid"})))
 ```
 
-The lib is actually uses [Martian](https://github.com/oliyh/martian) to do the
+The lib actually uses [Martian](https://github.com/oliyh/martian) to do the
 HTTP calls.  This means all functions take an options map which is actually the
 arguments expected by the Martian call. This can be a combination of path params,
 query args and a request body.
@@ -82,7 +82,7 @@ fetched first in order to obtain the actual http endpoint.
 	     deref
 	     :body
 	     :plaintext
-	     u/b64->
+	     v/b64->
 	     (String.)))
 ```
 
