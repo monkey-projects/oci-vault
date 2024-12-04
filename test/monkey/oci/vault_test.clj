@@ -69,7 +69,22 @@
       (let [c (-> crypto-client
                   (mt/respond-with {:decrypt (constantly {:status 200})}))]
         (is (= 200 (:status @(sut/decrypt c {:decrypt {:key-id "test-key-id"
-                                                       :ciphertext "some text to decrypt"}}))))))))
+                                                       :ciphertext "some text to decrypt"}}))))))
+
+    (testing "`generate-data-encryption-key` invokes `POST`"
+      (let [c (-> crypto-client
+                  (mt/respond-with {:generate-data-encryption-key (constantly {:status 200})}))]
+        (is (= 200 (:status @(sut/generate-data-encryption-key
+                              c
+                              {:key-details
+                               {:key-id "test-key-id"
+                                :include-plaintext-key true
+                                :associated-data "test data"
+                                :logging-context {"role" "server"}
+                                :key-shape
+                                {:algorithm "AES"
+                                 :curve-id "NIST_P256"
+                                 :length 512}}}))))))))
 
 (deftest make-mgmt-client
   (testing "fetches vault mgmt endpoint and returns a martian context"
@@ -88,13 +103,41 @@
                :api-root)))))
 
 (deftest key-endpoints
-    (let [mgmt-client (-> fake-conf
-                          (assoc :mgmt-endpoint "http://mgmt")
-                          (sut/make-mgmt-client))]
-      (testing "can list crypto keys"
-        (let [c (mt/respond-with mgmt-client
-                                 {:list-keys (constantly {:status 200})})]
-          (is (= 200 (:status @(sut/list-keys c {:compartment-id "test-compartment-id"}))))))))
+  (let [mgmt-client (-> fake-conf
+                        (assoc :mgmt-endpoint "http://mgmt")
+                        (sut/make-mgmt-client))]
+    (testing "can list crypto keys"
+      (let [c (mt/respond-with mgmt-client
+                               {:list-keys (constantly {:status 200})})]
+        (is (= 200 (:status @(sut/list-keys c {:compartment-id "test-compartment-id"}))))))))
+
+(deftest secret-endpoints
+  (let [client (sut/make-secret-client fake-conf)]
+    (testing "can create secret"
+      (is (= 200 (-> client
+                     (mt/respond-with-constant {:create-secret {:status 200}})
+                     (sut/create-secret {:secret {:compartment-id "test-ocid"
+                                                  :description "test secret"
+                                                  :key-id "test-key"
+                                                  :vault-id "test-vault"
+                                                  :secret-name "test-secret"}})
+                     deref
+                     :status))))
+
+    (testing "can update secret"
+      (is (= 200 (-> client
+                     (mt/respond-with-constant {:update-secret {:status 200}})
+                     (sut/update-secret {:secret-id "test-secret"
+                                         :secret {:description "test secret"}})
+                     deref
+                     :status))))
+
+    (testing "can get secret"
+      (is (= 200 (-> client
+                     (mt/respond-with-constant {:get-secret {:status 200}})
+                     (sut/get-secret {:secret-id "test-secret"})
+                     deref
+                     :status))))))
 
 (deftest base64
   (testing "to and from base64"

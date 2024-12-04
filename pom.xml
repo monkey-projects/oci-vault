@@ -4,7 +4,7 @@
   <packaging>jar</packaging>
   <groupId>com.monkeyprojects</groupId>
   <artifactId>oci-vault</artifactId>
-  <version>0.1.0-SNAPSHOT</version>
+  <version>0.2.0-SNAPSHOT</version>
   <name>oci-vault</name>
   <build>
     <sourceDirectory>src</sourceDirectory>

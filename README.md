@@ -89,6 +89,71 @@ fetched first in order to obtain the actual http endpoint.
 In a similar fashion you can create a management client using `make-mgmt-client`.
 You can specify a `:key-id` or `:mgmt-endpoint`.
 
+You can also generate a data encryption key.  The [Oracle documentation](https://docs.oracle.com/en-us/iaas/Content/KeyManagement/Tasks/usingkeys_topic-To_generate_a_data_encryption_key_from_your_Vault_master_encryption_key.htm)
+is a bit sparse about this, but it returns an AES key that can be used to do encryption/decryption
+without having to go to the Vault API for every call.  For instance, using
+[buddy.core](https://funcool.github.io/buddy-core/latest/index.html):
+
+```clojure
+;; Generate key
+(def key (-> (v/generate-data-encryption-key client
+                                             {:key-details
+					      {:key-id "key-ocid"
+					       :include-plaintext-key true
+					       :key-shape
+					       {:algorithm "AES"
+					        :length 32}}}) ; Must be 16, 24 or 32
+	     (deref)
+	     :body
+	     :plaintext))
+
+(require '[buddy.core.codecs :as codecs])
+(require '[buddy.core.crypto :as bcc])
+(require '[buddy.core.nonce :as bcn])
+
+;; Generate initialization vector, must be 16 bytes long
+(def iv (bcn/random-nonce 16))
+;; Convert key to bytes
+(def key-bytes (codecs/b64->bytes key))
+;; Do some encryption
+(def enc (bcc/encrypt (codecs/str->bytes "my secret message")
+                      key-bytes
+		      iv
+		      {:algo :aes-256-gcm})) ; Algo depends on you AES key size
+```
+
+### Secrets
+
+You can also create, update or retrieve secrets stored in the vault.  To this end, you first
+need to create the appropriate client.  Then you can invoke the appropriate functions: `create-secret`,
+`update-secret` and `get-secret`.
+
+```clojure
+(def client (v/make-secret-client config))
+
+;; Create new secret
+(def s (-> (v/create-secret client
+                            {:secret
+			     {:compartment-id "compartment-ocid"
+                              :vault-id "vault-ocid"
+			      :key-id "key-ocid"
+			      :secret-name "my-test-secret"
+			      :secret-content
+			      {:content-type "BASE64"
+			       :content "<some base64 string>"}}})
+	   (deref)
+	   :body)
+
+;; Update it
+@(v/update-secret client {:secret-id (:id s)
+                          :secret {:description "updated description"}})
+
+;; Retrieve it
+(-> (v/get-secret client {:secret-id (:id s)})
+    (deref)
+    :body)
+```
+
 ## Todo
 
  - Add more endpoints
