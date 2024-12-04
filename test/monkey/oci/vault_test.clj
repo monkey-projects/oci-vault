@@ -139,6 +139,16 @@
                      deref
                      :status))))))
 
+(deftest secret-retrieval-endpoints
+  (let [client (sut/make-secret-retrieval-client fake-conf)]
+    (testing "can get secret contents"
+      (is (= 200 (-> client
+                     (mt/respond-with-constant {:get-secret-bundle {:status 200}})
+                     (sut/get-secret-bundle {:secret-id "test-secret"
+                                             :stage "CURRENT"})
+                     deref
+                     :status))))))
+
 (deftest base64
   (testing "to and from base64"
     (let [in "test string"

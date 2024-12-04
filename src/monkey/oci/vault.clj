@@ -143,7 +143,7 @@
 
 (cu/define-endpoints *ns* mgmt-routes mc/response-for)
 
-(def secret-host (partial format (str "https://vaults.%s.oraclecloud.com/" version)))
+(def vault-host (partial format (str "https://vaults.%s.oraclecloud.com/" version)))
 
 (def target-system-base
   {:target-system-type (s/enum "ADB" "FUNCTION")})
@@ -257,7 +257,32 @@
 (defn make-secret-client
   "Creates a client that can be used to manage secrets"
   [conf]
-  (cm/make-context conf (comp secret-host :region) secret-routes))
+  (cm/make-context conf (comp vault-host :region) secret-routes))
+
+(s/defschema BundleStage (s/enum "CURRENT"
+                                 "PENDING"
+                                 "LATEST"
+                                 "PREVIOUS"
+                                 "DEPRECATED"))
+
+(def secret-retrieval-routes
+  [(api-route
+    {:route-name :get-secret-bundle
+     :method :get
+     :path-parts ["/secretbundles/" :secret-id]
+     :path-schema {:secret-id Id}
+     :query-schema {(opt :versionNumber) s/Int
+                    (opt :secretVersionName) s/Str
+                    (opt :stage) BundleStage}})])
+
+(cu/define-endpoints *ns* secret-retrieval-routes mc/response-for)
+
+(def secret-host (partial format "https://secrets.%s.oraclecloud.com/20190301"))
+
+(defn make-secret-retrieval-client
+  "Creates a client that can be used to manage secrets"
+  [conf]
+  (cm/make-context conf (comp secret-host :region) secret-retrieval-routes))
 
 (defn ->b64
   "Converts the input string to base64"

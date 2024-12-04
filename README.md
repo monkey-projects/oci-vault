@@ -119,7 +119,7 @@ without having to go to the Vault API for every call.  For instance, using
 (def enc (bcc/encrypt (codecs/str->bytes "my secret message")
                       key-bytes
 		      iv
-		      {:algo :aes-256-gcm})) ; Algo depends on you AES key size
+		      {:algo :aes-256-gcm})) ; Algo depends on your AES key size
 ```
 
 ### Secrets
@@ -150,6 +150,20 @@ need to create the appropriate client.  Then you can invoke the appropriate func
 
 ;; Retrieve it
 (-> (v/get-secret client {:secret-id (:id s)})
+    (deref)
+    :body)
+```
+
+Note that `get-secret` **does not return the secret contents**!  For this you need to
+create *another* client (why, Oracle?) using `make-secret-retrieval-client`.  Then you
+can use `get-secret-bundle` to fetch the contents.
+
+```clojure
+(def client (v/make-secret-retrieval-client config))
+
+(-> (v/get-secret-bundle client
+                         {:secret-id "secret-ocid"
+			  :stage "CURRENT"})
     (deref)
     :body)
 ```
