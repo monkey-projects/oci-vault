@@ -45,7 +45,7 @@
   [conf]
   (cm/make-context conf (comp kms-host :region) kms-routes))
 
-(cu/define-endpoints *ns* routes mc/response-for)
+(cu/define-endpoints *ns* kms-routes mc/response-for)
 
 (def crypto-endpoint
   "Utility function that retrieves the crypto endpoint for a vault."
