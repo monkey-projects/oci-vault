@@ -46,7 +46,13 @@ using your OCI configuration, then you can start invoking endpoints.
 The lib actually uses [Martian](https://github.com/oliyh/martian) to do the
 HTTP calls.  This means all functions take an options map which is actually the
 arguments expected by the Martian call. This can be a combination of path params,
-query args and a request body.
+query args and a request body.  The high-level calls declared in the `vault` ns
+hide the complexities of working with the Martian responses.  Instead, they
+automatically check if the response is successful, and if so, they unwrap the
+body of the response.  Otherwise an exception is thrown.  If you need more control
+over how the requests are handled, check the low-level calls below.
+
+## Low-level calls
 
 The raw response of each call is returned, as a `future`.  This is intended
 to allow the maximum flexibility when using the lib.  You can inspect the http
@@ -62,32 +68,36 @@ or the endpoint itself.  If the vault id is specified, the vault details will be
 fetched first in order to obtain the actual http endpoint.
 
 ```clojure
+(require '[monkey.oci.vault.crypto :as vc])
+(require '[monkey.oci.vault.b64 :as b])
+
 ;; This will look up the endpoint
-(def crypto-client (v/make-crypto-client (assoc config :vault-id "vault-ocid")))
+(def crypto-client (vc/make-crypto-client (assoc config :vault-id "vault-ocid")))
 ;; Alternatively you can add the endpoint directly
-(def crypto-client (v/make-crypto-client (assoc config :crypto-endpoint "http://crypto")))
+(def crypto-client (vc/make-crypto-client (assoc config :crypto-endpoint "http://crypto")))
 
 ;; Encryption expects a base64 string.  There are utility functions for this.
-(def enc (-> (v/encrypt crypto-client {:key-id "key-ocid"
-                                       :key-version-id "version-ocid"
-				       :plaintext (v/->b64 "very secret text to encrypt")})
+(def enc (-> (vc/encrypt crypto-client {:key-id "key-ocid"
+                                        :key-version-id "version-ocid"
+		  		        :plaintext (b/->b64 "very secret text to encrypt")})
 	     deref
 	     :body
 	     :ciphertext))
 
 ;; Decryption returns base64 encoded plain text
-(def dec (-> (v/decrypt crypto-client {:key-id "key-ocid"
-                                       :key-version-id "version-ocid"
-				       :ciphertext enc})
+(def dec (-> (vc/decrypt crypto-client {:key-id "key-ocid"
+                                        :key-version-id "version-ocid"
+				        :ciphertext enc})
 	     deref
 	     :body
 	     :plaintext
-	     v/b64->
+	     u/b64->
 	     (String.)))
 ```
 
 In a similar fashion you can create a management client using `make-mgmt-client`.
-You can specify a `:key-id` or `:mgmt-endpoint`.
+You can specify a `:key-id` or `:mgmt-endpoint`.  See the `monkey.oci.vault.mgmt`
+namespace for this.
 
 You can also generate a data encryption key.  The [Oracle documentation](https://docs.oracle.com/en-us/iaas/Content/KeyManagement/Tasks/usingkeys_topic-To_generate_a_data_encryption_key_from_your_Vault_master_encryption_key.htm)
 is a bit sparse about this, but it returns an AES key that can be used to do encryption/decryption
@@ -96,13 +106,13 @@ without having to go to the Vault API for every call.  For instance, using
 
 ```clojure
 ;; Generate key
-(def key (-> (v/generate-data-encryption-key client
-                                             {:key-details
-					      {:key-id "key-ocid"
-					       :include-plaintext-key true
-					       :key-shape
-					       {:algorithm "AES"
-					        :length 32}}}) ; Must be 16, 24 or 32
+(def key (-> (vc/generate-data-encryption-key client
+                                              {:key-details
+					       {:key-id "key-ocid"
+					        :include-plaintext-key true
+					        :key-shape
+					        {:algorithm "AES"
+					         :length 32}}}) ; Must be 16, 24 or 32
 	     (deref)
 	     :body
 	     :plaintext))
@@ -129,27 +139,29 @@ need to create the appropriate client.  Then you can invoke the appropriate func
 `update-secret` and `get-secret`.
 
 ```clojure
-(def client (v/make-secret-client config))
+(require '[monkey.oci.vault.secrets :as vs])
+
+(def client (vs/make-secret-client config))
 
 ;; Create new secret
-(def s (-> (v/create-secret client
-                            {:secret
-			     {:compartment-id "compartment-ocid"
-                              :vault-id "vault-ocid"
-			      :key-id "key-ocid"
-			      :secret-name "my-test-secret"
-			      :secret-content
-			      {:content-type "BASE64"
-			       :content "<some base64 string>"}}})
+(def s (-> (vs/create-secret client
+                             {:secret
+			      {:compartment-id "compartment-ocid"
+                               :vault-id "vault-ocid"
+			       :key-id "key-ocid"
+			       :secret-name "my-test-secret"
+			       :secret-content
+			       {:content-type "BASE64"
+			        :content "<some base64 string>"}}})
 	   (deref)
 	   :body)
 
 ;; Update it
-@(v/update-secret client {:secret-id (:id s)
-                          :secret {:description "updated description"}})
+@(vs/update-secret client {:secret-id (:id s)
+                           :secret {:description "updated description"}})
 
 ;; Retrieve it
-(-> (v/get-secret client {:secret-id (:id s)})
+(-> (vs/get-secret client {:secret-id (:id s)})
     (deref)
     :body)
 ```
@@ -159,11 +171,13 @@ create *another* client (why, Oracle?) using `make-secret-retrieval-client`.  Th
 can use `get-secret-bundle` to fetch the contents.
 
 ```clojure
-(def client (v/make-secret-retrieval-client config))
+(require '[monkey.oci.vault.secrets :as vs])
 
-(-> (v/get-secret-bundle client
-                         {:secret-id "secret-ocid"
-			  :stage "CURRENT"})
+(def client (vs/make-secret-retrieval-client config))
+
+(-> (vs/get-secret-bundle client
+                          {:secret-id "secret-ocid"
+			   :stage "CURRENT"})
     (deref)
     :body)
 ```
