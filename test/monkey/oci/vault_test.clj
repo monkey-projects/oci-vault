@@ -40,8 +40,8 @@
     (let [client {:mgmt (atom {:client
                                (-> (mgmt/make-mgmt-client (assoc th/fake-conf :mgmt-endpoint "http://test"))
                                    (mt/respond-with-constant {:list-keys {:status 200
-                                                                          :body ::test-result}}))})}]
-      (is (= ::test-result (sut/list-keys client {:compartment-id "test-compartment"})))))
+                                                                          :body [::test-result]}}))})}]
+      (is (= [::test-result] (sut/list-keys client {:compartment-id "test-compartment"})))))
 
   (let [inv (atom 0)]
     (with-redefs [mgmt/make-mgmt-client (fn [conf]
@@ -50,10 +50,10 @@
                                               (mt/respond-with {:list-keys
                                                                 (fn [req]
                                                                   (atom {:status 200
-                                                                         :body (:url req)}))})))]
+                                                                         :body [(:url req)]}))})))]
       (let [client (sut/make-client th/fake-conf)]
         (testing "fetches mgmt endpoint for vault if not specified in config"
-          (is (= "http://test-mgmt/keys"
+          (is (= ["http://test-mgmt/keys"]
                  (sut/list-keys client {:compartment-id "test-compartment"
                                         :vault-id "test-vault"}))))
 

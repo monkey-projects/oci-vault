@@ -69,7 +69,8 @@ The high-level calls declared in the `vault` ns hide the complexities of working
 with the Martian responses.  Instead, they automatically check if the response is
 successful, and if so, they unwrap the body of the response.  Otherwise an exception
 is thrown.  If you need more control over how the requests are handled, check the
-low-level calls below.
+low-level calls below.  Pagination is also handled by the wrapper functions for
+`list-` calls.
 
 ## Available calls
 
@@ -99,6 +100,9 @@ The raw response of each call is returned, as a `future`.  This is intended
 to allow the maximum flexibility when using the lib.  You can inspect the http
 status code yourself.  The body is automatically parsed from `JSON`, depending
 on the `Content-Type` header.
+
+Note also that pagination is not handled by these low-level calls, so you will
+have to do that yourselves.
 
 ### Encryption/Decryption
 

@@ -1,4 +1,4 @@
-{:deps {com.monkeyprojects/oci-common {:mvn/version "0.1.2"}}
+{:deps {com.monkeyprojects/oci-common {:mvn/version "0.2.0-SNAPSHOT"}}
  
  :aliases
  {:dev
