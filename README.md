@@ -38,9 +38,25 @@ using your OCI configuration, then you can start invoking endpoints.
 
 ;; Create a client
 (def client (v/make-client config))
+(def cid "<compartment-ocid>")
 
 ;; The client can be used to do general calls
-(def vault (:body @(v/get-vault client {:vault-id "vault-ocid"})))
+(def vault (v/get-vault client {:vault-id "vault-ocid" :compartment-id cid}))
+(def vault-keys (v/list-keys client {:vault-id (:id vault) :compartment-id cid}))
+
+;; Encryption
+(def key-id (-> vault-keys first :id))
+
+;; Note that the text must be base64-encoded
+(require '[monkey.oci.vault.b64 :as b])
+(def enc (v/encrypt client {:key-id key-id :plaintext (b/->b64 "secret message")}))
+;; => {:ciphertext "<base64-encoded cipher>" ...}
+
+;; Decrypt it back
+(def msg (-> (v/decrypt client {:key-id key-id :ciphertext (:ciphertext enc)})
+             :plaintext
+	     (b/b64->str)))  ; Make sure to decode back from base64
+;; => "secret message"
 ```
 
 The lib actually uses [Martian](https://github.com/oliyh/martian) to do the

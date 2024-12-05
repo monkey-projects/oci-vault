@@ -55,7 +55,7 @@
 (def ^:private get-crypto-client (partial resolve-client #'crypto/make-crypto-client :crypto))
 
 (defn- lazy-init-call [getter ctx id params]
-  (let [client (get-mgmt-client ctx id params)]
+  (let [client (getter ctx id params)]
     ((response-for (constantly client)) ctx id params)))
 
 ;; Define all routes for kms
