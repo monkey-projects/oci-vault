@@ -62,13 +62,37 @@ using your OCI configuration, then you can start invoking endpoints.
 The lib actually uses [Martian](https://github.com/oliyh/martian) to do the
 HTTP calls.  This means all functions take an options map which is actually the
 arguments expected by the Martian call. This can be a combination of path params,
-query args and a request body.  The high-level calls declared in the `vault` ns
-hide the complexities of working with the Martian responses.  Instead, they
-automatically check if the response is successful, and if so, they unwrap the
-body of the response.  Otherwise an exception is thrown.  If you need more control
-over how the requests are handled, check the low-level calls below.
+query args and a request body.  Check the [Oracle API docs](https://docs.oracle.com/en-us/iaas/api/]
+for more on which request requires which parameters.
+
+The high-level calls declared in the `vault` ns hide the complexities of working
+with the Martian responses.  Instead, they automatically check if the response is
+successful, and if so, they unwrap the body of the response.  Otherwise an exception
+is thrown.  If you need more control over how the requests are handled, check the
+low-level calls below.
+
+## Available calls
+
+Currently, these calls are exposed by the vault library:
+
+ - `get-vault`
+ - `list-vaults`
+ - `list-keys`
+ - `encrypt`
+ - `decrypt`
+ - `generate-data-encryption-key`
+ - `create-secret`
+ - `update-secret`
+ - `get-secret`
+ - `get-secret-bundle`
+
+More will be added as needed, or you can add some yourself.  PR's are welcome!
 
 ## Low-level calls
+
+If you need more control over how the calls are processed, including using
+them in an async fashion, you can invoke the lower-level calls directly.  These
+reside in several namespaces, depending on which kind of category you need.
 
 The raw response of each call is returned, as a `future`.  This is intended
 to allow the maximum flexibility when using the lib.  You can inspect the http
@@ -200,7 +224,8 @@ can use `get-secret-bundle` to fetch the contents.
 
 ## Todo
 
- - Add more endpoints
+ - Add more endpoints.
+ - Add more documentation, especially on the required parameters for each call.
 
 ## License
 
