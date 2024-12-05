@@ -49,7 +49,13 @@
      :method :get
      :path-parts ["/secretbundles/" :secret-id]
      :path-schema {:secret-id s/Id}
-     :query-schema s/SecretRetrievalQuery})])
+     :query-schema s/SecretRetrievalQuery})
+
+   (h/api-route
+    {:route-name :get-secret-bundle-by-name
+     :method :get
+     :path-parts ["/secretbundles/actions/getByName"]
+     :query-schema s/SecretRetrievalByNameQuery})])
 
 (cu/define-endpoints *ns* secret-retrieval-routes mc/response-for)
 

@@ -44,10 +44,20 @@
 
 (deftest secret-retrieval-endpoints
   (let [client (sut/make-secret-retrieval-client fake-conf)]
-    (testing "can get secret contents"
+    (testing "can get secret bundle"
       (is (= 200 (-> client
                      (mt/respond-with-constant {:get-secret-bundle {:status 200}})
                      (sut/get-secret-bundle {:secret-id "test-secret"
                                              :stage "CURRENT"})
+                     deref
+                     :status))))
+
+    (testing "can get secret bundle by name"
+      (is (= 200 (-> client
+                     (mt/respond-with-constant {:get-secret-bundle-by-name {:status 200}})
+                     (sut/get-secret-bundle-by-name
+                      {:vault-id "test-vault"
+                       :secret-name "test-secret"
+                       :stage "CURRENT"})
                      deref
                      :status))))))

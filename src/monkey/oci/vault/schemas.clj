@@ -167,3 +167,8 @@
   {(opt :versionNumber) s/Int
    (opt :secretVersionName) s/Str
    (opt :stage) BundleStage})
+
+(s/defschema SecretRetrievalByNameQuery
+  (assoc SecretRetrievalQuery
+         :secretName s/Str
+         :vaultId s/Str))

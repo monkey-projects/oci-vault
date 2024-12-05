@@ -87,6 +87,7 @@ Currently, these calls are exposed by the vault library:
  - `update-secret`
  - `get-secret`
  - `get-secret-bundle`
+ - `get-secret-bundle-by-name`
 
 More will be added as needed, or you can add some yourself.  PR's are welcome!
 
@@ -213,7 +214,7 @@ need to create the appropriate client.  Then you can invoke the appropriate func
 
 Note that `get-secret` **does not return the secret contents**!  For this you need to
 create *another* client (why, Oracle?) using `make-secret-retrieval-client`.  Then you
-can use `get-secret-bundle` to fetch the contents.
+can use `get-secret-bundle` or `get-secret-bundle-by-name` to fetch the contents.
 
 ```clojure
 (require '[monkey.oci.vault.secrets :as vs])

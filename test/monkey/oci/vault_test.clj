@@ -84,4 +84,7 @@
 
 (deftest secret-retrieval-routes
   (testing "`get-secret-bundle` exists"
-    (is (fn? sut/get-secret-bundle))))
+    (is (fn? sut/get-secret-bundle)))
+
+  (testing "`get-secret-bundle-by-name` exists"
+    (is (fn? sut/get-secret-bundle-by-name))))
