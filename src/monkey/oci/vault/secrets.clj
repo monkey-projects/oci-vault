@@ -11,7 +11,13 @@
 (def vault-host (partial format (str "https://vaults.%s.oraclecloud.com/" h/api-version)))
 
 (def secret-routes
-  [(h/api-route
+  [(h/paged-route
+    {:route-name :list-secrets
+     :method :get
+     :path-parts ["/secrets"]
+     :query-schema s/ListSecretsQuery})
+
+   (h/api-route
     {:route-name :create-secret
      :method :post
      :path-parts ["/secrets"]

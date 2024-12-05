@@ -8,6 +8,14 @@
 
 (deftest secret-endpoints
   (let [client (sut/make-secret-client fake-conf)]
+    (testing "can list secrets"
+      (is (= 200 (-> client
+                     (mt/respond-with-constant {:list-secrets {:status 200}})
+                     (sut/list-secrets {:compartment-id "test-ocid"
+                                        :name "test-secret"})
+                     deref
+                     :status))))
+    
     (testing "can create secret"
       (is (= 200 (-> client
                      (mt/respond-with-constant {:create-secret {:status 200}})

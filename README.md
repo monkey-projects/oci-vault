@@ -81,6 +81,7 @@ Currently, these calls are exposed by the vault library:
  - `encrypt`
  - `decrypt`
  - `generate-data-encryption-key`
+ - `list-secrets`
  - `create-secret`
  - `update-secret`
  - `get-secret`

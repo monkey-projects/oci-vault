@@ -8,6 +8,10 @@
 
 (def Id s/Str)
 
+(defn sortable-query [sort-props]
+  {(opt :sortBy) (apply s/enum sort-props)
+   (opt :sortOrder) (s/enum "ASC" "DESC")})
+
 (s/defschema DefinedTags {s/Str {s/Str s/Str}})
 (s/defschema FreeformTags {s/Str s/Str})
 (s/defschema Algorithm (s/enum "AES" "RSA" "ECDSA"))
@@ -45,6 +49,26 @@
    (opt :protectionMode) (s/enum "HSM" "SOFTWARE" "EXTERNAL")
    (opt :algorithm) Algorithm
    (opt :curveId) Id})
+
+(s/defschema SecretLifecycleState
+  (s/enum
+   "CREATING"
+   "ACTIVE"
+   "UPDATING"
+   "DELETING"
+   "DELETED"
+   "SCHEDULING_DELETION"
+   "PENDING_DELETION"
+   "CANCELLING_DELETION"
+   "FAILED"))
+
+(s/defschema ListSecretsQuery
+  (merge
+   (sortable-query ["NAME" "TIMECREATED"])
+   {:compartmentId Id
+    (opt :name) s/Str
+    (opt :vaultId) Id
+    (opt :lifecycleState) SecretLifecycleState}))
 
 (def target-system-base
   {:target-system-type (s/enum "ADB" "FUNCTION")})

@@ -37,7 +37,6 @@
         (throw-on-error!)
         :body)))
 
-
 (defn- resolve-client [maker prop ctx id params]
   (letfn [(init-client [a]
             (swap! a (fn [{:keys [config] :as c}]
