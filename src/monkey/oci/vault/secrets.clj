@@ -21,14 +21,16 @@
     {:route-name :create-secret
      :method :post
      :path-parts ["/secrets"]
-     :body-schema {:secret s/CreateSecret}})
+     :body-schema {:secret s/CreateSecret}
+     :consumes h/json})
    
    (h/api-route
     {:route-name :update-secret
      :method :post
      :path-parts ["/secrets/" :secret-id]
      :path-schema {:secret-id s/Id}
-     :body-schema {:secret s/UpdateSecret}})
+     :body-schema {:secret s/UpdateSecret}
+     :consumes h/json})
 
    (h/api-route
     {:route-name :get-secret
