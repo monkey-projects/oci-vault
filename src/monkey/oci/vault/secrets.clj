@@ -59,7 +59,7 @@
 
 (cu/define-endpoints *ns* secret-retrieval-routes mc/response-for)
 
-(def secret-host (partial format "https://secrets.%s.oraclecloud.com/20190301"))
+(def secret-host (partial format "https://secrets.vaults.%s.oraclecloud.com/20190301"))
 
 (defn make-secret-retrieval-client
   "Creates a client that can be used to manage secrets"
