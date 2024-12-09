@@ -8,7 +8,7 @@
              [kms :as kms]
              [schemas :as s]]))
 
-(def vault-host (partial format (str "https://vaults.%s.oraclecloud.com/" h/api-version)))
+(def vault-host (partial format (str "https://vaults.%s.oci.oraclecloud.com/" h/api-version)))
 
 (def secret-routes
   [(h/paged-route
@@ -59,7 +59,7 @@
 
 (cu/define-endpoints *ns* secret-retrieval-routes mc/response-for)
 
-(def secret-host (partial format "https://secrets.vaults.%s.oraclecloud.com/20190301"))
+(def secret-host (partial format "https://secrets.vaults.%s.oci.oraclecloud.com/20190301"))
 
 (defn make-secret-retrieval-client
   "Creates a client that can be used to manage secrets"
