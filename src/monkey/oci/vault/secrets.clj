@@ -55,7 +55,7 @@
 
    (h/api-route
     {:route-name :get-secret-bundle-by-name
-     :method :get
+     :method :post
      :path-parts ["/secretbundles/actions/getByName"]
      :query-schema s/SecretRetrievalByNameQuery})])
 
