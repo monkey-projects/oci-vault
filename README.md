@@ -232,6 +232,7 @@ can use `get-secret-bundle` or `get-secret-bundle-by-name` to fetch the contents
 
  - Add more endpoints.
  - Add more documentation, especially on the required parameters for each call.
+ - Integration tests
 
 ## License
 
