@@ -4,7 +4,7 @@
   <packaging>jar</packaging>
   <groupId>com.monkeyprojects</groupId>
   <artifactId>oci-vault</artifactId>
-  <version>0.2.0-SNAPSHOT</version>
+  <version>0.2.1-SNAPSHOT</version>
   <name>oci-vault</name>
   <build>
     <sourceDirectory>src</sourceDirectory>
@@ -29,11 +29,6 @@
       <groupId>org.clojure</groupId>
       <artifactId>clojure</artifactId>
       <version>1.12.0</version>
-    </dependency>
-    <dependency>
-      <groupId>com.monkeyprojects</groupId>
-      <artifactId>oci-common</artifactId>
-      <version>0.1.2</version>
     </dependency>
   </dependencies>
 </project>
